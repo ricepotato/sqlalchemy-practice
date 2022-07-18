@@ -26,7 +26,7 @@ class SqlalchemyRepository(Repository):
     def __init__(self, session: Session):
         self.session = session
 
-    def add(self, obj) -> int:
+    def add(self, obj: User) -> int:
         # with self.session.begin():
         #    self.session.add(obj)
         #    self.session.commit()
@@ -34,8 +34,7 @@ class SqlalchemyRepository(Repository):
         #
 
         self.session.add(obj)
-        self.session.flush()
-
+        self.session.commit()
         return obj.id
 
     def get_user(self, user_id) -> User:
@@ -51,8 +50,11 @@ class SqlalchemyRepository(Repository):
         return self.session.query(Address).filter(Address.user_id == user.id).all()
 
     def delete_user_by_id(self, user_id: int) -> bool:
-        return self.session.query(User).filter(User.id == user_id).delete() == 1
+        self.session.query(User).filter(User.id == user_id).delete()
+        self.session.commit()
+        return True
 
     def delete_user(self, user: User) -> bool:
         self.session.delete(user)
+        self.session.commit()
         return True
